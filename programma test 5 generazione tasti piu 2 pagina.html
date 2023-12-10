@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Dentistico Specializzato</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        #queue-number1 {
+            font-size: 50px;
+            font-weight: bold;
+            color: #da0813;
+        }
+
+        #reset-number-btn {
+            display: none; /* Inizialmente nascondi il pulsante di reset */
+            font-size: 16px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #get-number-btn, #login-btn, #show-booking-btn {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Sistema di Salta Coda</h2>
+<p>Clicca il pulsante per ottenere il tuo numero di salta coda:</p>
+
+<div id="queue-number1">N/D</div>
+<p>
+    <button id="get-number-btn" onclick="generateQueueNumber()">Ottieni Numero</button>
+</p>
+<p>
+    <button id="login-btn" onclick="login()">Login</button>
+</p>
+<button id="reset-number-btn" onclick="resetQueueNumber()">Reset (Password richiesta)</button>
+<p>
+    <button id="show-booking-btn" onclick="showBookingNumber()">Mostra Prenotazione</button>
+</p>
+
+<script>
+    let userBookings = JSON.parse(localStorage.getItem('userBookings')) || {};
+    let queueCounter1 = Object.values(userBookings).reduce((max, booking) => Math.max(max, booking.queueNumber), 0);
+
+    // Chiamare la funzione per impostare il numero corrente
+    setQueueNumber();
+
+    function setQueueNumber() {
+        // Mostrare il numero di salta coda nella pagina
+        document.getElementById('queue-number1').textContent = queueCounter1 !== 0 ? queueCounter1 : 'N/D';
+    }
+
+    function generateQueueNumber() {
+        // Ottenere l'identificativo dell'utente (in questo caso, il nome)
+        const userName = getUserName();
+
+        // Assicurarsi che l'identificativo dell'utente sia disponibile
+        if (userName) {
+            // Verificare se l'utente ha già prenotato un numero
+            if (!userBookings[userName]) {
+                // Incrementare il contatore globale
+                queueCounter1++;
+
+                // Memorizzare le informazioni dell'utente
+                userBookings[userName] = { queueNumber: queueCounter1 };
+
+                // Salva le informazioni nell'localStorage
+                localStorage.setItem('userBookings', JSON.stringify(userBookings));
+
+                // Mostrare il numero di salta coda nella pagina
+                setQueueNumber();
+                // Registrare l'associazione tra l'identificativo dell'utente e il numero di salta coda sul lato server
+                console.log('Numero di salta coda associato a', userName);
+            } else {
+                alert(`${userName}, hai già ottenuto un numero di salta coda.`);
+            }
+        } else {
+            alert("Impossibile ottenere l'identificativo dell'utente. Riprova più tardi.");
+        }
+    }
+
+    function login() {
+        const password = prompt("Inserisci la password:");
+
+        // Verificare la password
+        if (password === "2396") {
+            // Mostrare il pulsante di reset dopo il login
+            document.getElementById('reset-number-btn').style.display = 'inline-block';
+            alert("Login effettuato con successo.");
+        } else {
+            alert("Password errata. Login fallito.");
+        }
+    }
+
+    function resetQueueNumber() {
+        const password = prompt("Inserisci la password per il reset:");
+
+        // Verificare la password
+        if (password === "555") {
+            // Reset del contatore globale
+            queueCounter1 = 0;
+
+            // Aggiornare il numero di salta coda nella pagina
+            setQueueNumber();
+
+            // Azzerare le prenotazioni nell'localStorage
+            userBookings = {};
+            localStorage.setItem('userBookings', JSON.stringify(userBookings));
+
+            alert("Reset completato con successo.");
+        } else {
+            alert("Password errata. Impossibile effettuare il reset.");
+        }
+    }
+
+    function showBookingNumber() {
+        // Ottenere l'identificativo dell'utente (in questo caso, il nome)
+        const userName = getUserName();
+
+        // Assicurarsi che l'identificativo dell'utente sia disponibile
+        if (userName) {
+            // Verificare se l'utente ha una prenotazione
+            if (userBookings[userName]) {
+                const userQueueNumber = userBookings[userName].queueNumber;
+                alert(`${userName}, il tuo numero di salta coda è: ${userQueueNumber}`);
+            } else {
+                alert(`${userName}, non hai ancora ottenuto un numero di salta coda.`);
+            }
+        } else {
+            alert("Impossibile ottenere l'identificativo dell'utente. Riprova più tardi.");
+        }
+    }
+
+    function getUserName() {
+        // Chiedere all'utente di inserire il proprio nome (simulazione a scopo dimostrativo)
+        const userName = prompt("Inserisci il tuo nome:");
+        return userName;
+    }
+</script>
+
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizzazione Numero Progressivo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        #queue-number {
+            font-size: 50px;
+            font-weight: bold;
+            color: #0ba852;
+        }
+
+        #advance-number-btn {
+            font-size: 16px;
+            padding: 10px 20px;
+            cursor: pointer;
+            display: none; /* Inizialmente nascondi il pulsante Avanti e Reset */
+        }
+
+        #login-btn {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h2>Serviamo il numero</h2>
+    <p>Numero Generato:</p>
+    <p>
+    <div id="queue-number">N/D</div>
+    </p>
+    <button id="advance-number-btn" onclick="advanceQueueNumber()">Avanti</button>
+
+    <script>
+        let userBookingsViewer = JSON.parse(localStorage.getItem('userBookingsViewer')) || {};
+        let queueCounterViewer = Object.values(userBookingsViewer).reduce((max, booking) => Math.max(max, booking.queueNumber), 0);
+
+        let isLoggedIn = false; // Aggiunta variabile di stato per il login
+
+        // Chiamare la funzione per impostare il numero corrente e la visibilità del pulsante
+        setQueueNumber();
+
+        function setQueueNumber() {
+            // Mostrare il numero progressivo nella pagina
+            document.getElementById('queue-number').textContent = queueCounterViewer !== 0 ? queueCounterViewer : 'N/D';
+
+            // Verificare lo stato di login per mostrare/nascondere il pulsante
+            if (isLoggedIn) {
+                document.getElementById('advance-number-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('advance-number-btn').style.display = 'none';
+            }
+        }
+
+        function advanceQueueNumber() {
+            // Incrementare il numero di salta coda
+            queueCounterViewer++;
+
+            // Aggiornare il numero di salta coda nella pagina
+            setQueueNumber();
+        }
+
+        // Funzione di login con la password "2397"
+        function login() {
+            const password = prompt("Inserisci la password:");
+
+            if (password === "2397") {
+                isLoggedIn = true;
+                setQueueNumber(); // Aggiorna la visibilità del pulsante Avanti dopo il login
+                alert("Login effettuato con successo.");
+            } else {
+                alert("Password errata. Login fallito.");
+            }
+        }
+
+        // Aggiungi un ascoltatore per rilevare i cambiamenti nella localStorage
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'userBookingsViewer') {
+                userBookingsViewer = JSON.parse(event.newValue);
+                queueCounterViewer = Object.values(userBookingsViewer).reduce((max, booking) => Math.max(max, booking.queueNumber), 0);
+                setQueueNumber();
+            }
+        });
+
+        // Aggiungi il pulsante di login
+        document.write('<button id="login-btn" onclick="login()">Login</button>');
+    </script>
+</body>
+</html>
+
